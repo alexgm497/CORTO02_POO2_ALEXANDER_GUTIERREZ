@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" 
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:composition template="WEB-INF/resources/fragmentos/comun.xhtml">
+        <!-- Título de la página -->
+        <ui:param name="pageTitl" value="Creación de usuario-roles"/>
+        <ui:param name="pageNomb" value="Usuario-Roles"/>
+        <!-- Activar el link del menú -->
+        <ui:param name="actiIndex" value="active"/>
+        <!-- Scripts personalizados -->
+        <ui:define name="CustomScripts">
+            <h:outputScript library="js" name="custom/usua-role.js"/>
+        </ui:define>
+        <!-- Elementos propios del boby -->
+        <ui:define name="body">            
+            <div>
+                <div class="col-md-4 col-xs-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Formulario</div>
+                        <div class="panel-body">
+                            <h:form>
+                                <!--Form exclusivo para los remotos-->
+                                <p:remoteCommand name="consUsuaRole" actionListener="#{usuariosRolesBean.cons()}" update=":FormUsuaRole" 
+                                                 oncomplete="INIT_OBJE_USUA_ROLE();" global="true"/>
+                            </h:form>
+                            <h:form id="FormUsuaRole">
+                                <h:inputHidden id="codi" value="#{usuariosRolesBean.objeUsuaRole.codiUsuaRole}" />
+                                <div class="input-group input-group-xs">
+                                    <h:outputLabel  for="rol" value="Rol: "/>
+                                    <h:selectOneMenu id="rol" value="#{usuariosRolesBean.objeUsuaRole.codiRole}" class="form-control">
+                                        <f:selectItem pt:data-hidden="true" itemLabel="Seleccione..."/>
+                                        <f:selectItems value="#{rolesBean.listRole}" var="lst" itemLabel="#{lst.descRole}" itemValue="#{lst}"/>
+                                        <f:converter converterId="PooConv"/>
+                                    </h:selectOneMenu>
+                                    <h:message for="rol" errorClass="field-error" />
+                                </div>
+                                <div class="input-group input-group-xs">
+                                    <h:outputLabel  for="usua" value="Usuario: "/>
+                                    <h:selectOneMenu id="usua" value="#{usuariosRolesBean.objeUsuaRole.codiUsua}" class="form-control">
+                                        <f:selectItem pt:data-hidden="true" itemLabel="Seleccione..."/>
+                                        <f:selectItems value="#{usuariosBean.listUsua}" var="lst2" itemLabel="#{lst2.acceUsua}" itemValue="#{lst2}"/>
+                                        <f:converter converterId="PooConv"/>
+                                    </h:selectOneMenu>
+                                    <h:message for="usua" errorClass="field-error" />
+                                </div>                                
+                                <h:inputHidden id="esta" value="#{usuariosRolesBean.objeUsuaRole.estaUsuaRole}"/>
+                                <h:inputHidden id="alta" value="#{usuariosRolesBean.objeUsuaRole.fechAltaRole}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:inputHidden>
+                                <h:inputHidden id="baja" value="#{usuariosRolesBean.objeUsuaRole.fechBajaRole}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:inputHidden>
+                                <div class="input-group-btn right" style="padding-top: 5px;">
+                                    <div class="btn-group">
+                                        <h:commandLink id="btonCanc" class="btn btn-default btn-xs">
+                                            <p:ajax listener="#{usuariosRolesBean.limpForm()}" update="@form" global="true"/>
+                                            <i class="fa fa-mail-forward"/> Cancelar
+                                        </h:commandLink>                                        
+                                        <c:choose>
+                                            <c:when test="#{usuariosRolesBean.guardar == true}">
+                                                <h:commandLink id="btonGuar" class="btn btn-success btn-xs">
+                                                    <p:ajax listener="#{usuariosRolesBean.guar()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-plus"/> Guardar
+                                                </h:commandLink>
+                                                <h:commandLink id="btonModi" class="btn btn-primary btn-xs disabled">
+                                                    <p:ajax listener="#{usuariosRolesBean.modi()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-edit"/> Modificar
+                                                </h:commandLink>
+                                                <h:commandLink id="btonElim" class="btn btn-danger btn-xs disabled" onclick="return confirm('¿Desea borrar el registro?')">
+                                                    <p:ajax listener="#{usuariosRolesBean.elim()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-times"/> Eliminar
+                                                </h:commandLink>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <h:commandLink id="btonGuar" class="btn btn-success btn-xs disabled">
+                                                    <p:ajax listener="#{usuariosRolesBean.guar()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-plus"/> Guardar
+                                                </h:commandLink>
+                                                <h:commandLink id="btonModi" class="btn btn-primary btn-xs">
+                                                    <p:ajax listener="#{usuariosRolesBean.modi()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-edit"/> Modificar
+                                                </h:commandLink>
+                                                <h:commandLink id="btonElim" class="btn btn-danger btn-xs" onclick="return confirm('¿Desea borrar el registro?')">
+                                                    <p:ajax listener="#{usuariosRolesBean.elim()}" process="@form" update="@form :ContUsuaRole" oncomplete="INIT_OBJE_USUA_ROLE();" />
+                                                    <i class="fa fa-times"/> Eliminar
+                                                </h:commandLink>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 col-xs-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Tabla de Datos</div>
+                        <div class="panel-body">
+                            <h:panelGroup id="ContUsuaRole">
+                                <h:dataTable pt:data-id="TablUsuaRole" id="TablUsuaRole" value="#{usuariosRolesBean.listUsuaRole}"
+                                             var="fila" class="boottable" pt:data-toolbar="#toolbar"
+                                             styleClass="table-hover table-bordered table-condensed table-striped table-responsive"
+                                             pt:data-show-refresh="false" pt:data-show-toggle="false" pt:data-show-columns="false" 
+                                             pt:data-search="true" pt:data-pagination="true" pt:data-page-list="[5, 10, 20, 50]"
+                                             pt:data-click-to-select="true"  pt:data-select-item-name="radio"
+                                             pt:data-single-select="true">                                
+                                    <h:column pt:data-field="state" pt:data-checkbox="true">
+                                    </h:column>
+                                    <h:column pt:data-align="right" pt:data-sortable="true" pt:data-field="id">
+                                        <f:facet name="header">Código</f:facet>
+                                        <h:outputText value="#{fila.codiUsuaRole}"/>
+                                    </h:column>
+                                    <h:column pt:data-sortable="true" pt:data-field="rol">
+                                        <f:facet name="header">Rol</f:facet>
+                                        <h:outputText value="#{fila.codiRole.descRole}"/>   
+                                    </h:column>
+                                    <h:column pt:data-sortable="true" pt:data-field="usua">
+                                        <f:facet name="header">Usuario</f:facet>
+                                        <h:outputText value="#{fila.codiUsua.acceUsua}"/>   
+                                    </h:column>
+                                    <h:column pt:data-sortable="true" pt:data-field="alta">
+                                        <f:facet name="header">Fecha Alta</f:facet>
+                                        <h:outputText value="#{fila.fechAltaRole}">
+                                            <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                                        </h:outputText>   
+                                    </h:column>
+                                    <h:column pt:data-sortable="true" pt:data-field="baja">
+                                        <f:facet name="header">Fecha Baja</f:facet>
+                                        <h:outputText value="#{fila.fechBajaRole}">
+                                            <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+                                        </h:outputText>   
+                                    </h:column> 
+                                    <h:column pt:data-sortable="true" pt:data-field="esta">
+                                        <f:facet name="header">Estado</f:facet> 
+                                        <h:panelGroup class="label label-success" rendered="#{fila.estaUsuaRole eq '1'}">
+                                            <i class="fa fa-unlock"/>Activo</h:panelGroup>
+                                        <h:panelGroup class="label label-danger" rendered="#{fila.estaUsuaRole ne '1'}">
+                                            <i class="fa fa-lock"/>Inactivo</h:panelGroup>
+                                    </h:column>
+                                </h:dataTable>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ui:define>
+    </ui:composition>
+</html>
